@@ -14,7 +14,14 @@ import {getSupplierUsers, checkSupplierPause } from './server.js';
 dotenv.config();
 const app = express();
 
-app.use(cors());
+// Configure CORS to allow requests from your frontend
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const firebaseConfig = {
