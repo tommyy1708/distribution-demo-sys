@@ -16,6 +16,12 @@ const db = mysql
   })
   .promise();
 
+async function getUsers() {
+  const resUsers = await db.query(`SELECT * FROM user_data`);
+  return resUsers[0];
+
+  }
+
   async function getSupplierUsers(email) {
     const rows = await db.query(
       `
@@ -42,4 +48,4 @@ async function checkSupplierPause(userEmail) {
   }
 }
 
-export { getSupplierUsers, checkSupplierPause };
+export { getSupplierUsers, checkSupplierPause, getUsers };

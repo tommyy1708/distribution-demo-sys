@@ -1,5 +1,3 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from 'firebase/app';
 import express from 'express';
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
@@ -10,34 +8,19 @@ import multer from 'multer';
 import csvParser from 'csv-parser';
 import fs from 'fs';
 import cors from 'cors';
-import {getSupplierUsers, checkSupplierPause } from './server.js';
+import {getSupplierUsers, checkSupplierPause,getUsers } from './server.js';
 dotenv.config();
 const app = express();
 
-// Configure CORS to allow requests from your frontend
-const corsOptions = {
-  origin: 'http://localhost:3000',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-};
+app.use(cors());
 
-app.use(cors(corsOptions));
 app.use(express.json());
 
-const firebaseConfig = {
-  apiKey: process.env.NODE_APP_APIKEY,
-  authDomain: process.env.NODE_APP_AUTHDOMAIN,
-  projectId: process.env.NODE_APP_PROJECTID,
-  storageBucket: process.env.NODE_APP_STORAGEBUKET,
-  messagingSenderId: process.env.NODE_APP_MESSAGESENDID,
-  appId: process.env.NODE_APP_APPID,
-  measurementId: process.env.NODE_APP_MESUREMENTID,
-};
+app.get('/api/users', async (req, res) => {
+  const users = await getUsers();
+  res.send(users);
+ });
 
-// Load service account credentials
-const admin = initializeApp(firebaseConfig);
-
-// hair supplier Apis
 app.post('/api/supplier-login', async (req, res) => {
   const { email, password } = req.body;
 
