@@ -1,6 +1,5 @@
 
 import mysql from 'mysql';
-import app from './index.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -21,11 +20,5 @@ connection.connect((err) => {
   console.log('Connected to the MySQL server');
 });
 
-app.get('/', (req, res) => {
-  connection.query('SELECT * FROM users', (err, rows) => {
-    if (err) throw err;
-    console.log('Data received from Db:');
-    console.log(rows);
-    res.send(rows);
-  });
-});
+
+export default connection;

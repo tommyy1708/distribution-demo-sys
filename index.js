@@ -2,11 +2,10 @@
 import { initializeApp } from 'firebase/app';
 import dotenv from 'dotenv';
 import express from 'express';
+import mongoose from './mongodb.js';
+import mysqlConnection from './mysql.js';
 
 
-
-import mongoose from 'mongoose';
-import Users from './models/users.model.js';
 const app = express();
 
 dotenv.config();
@@ -29,26 +28,19 @@ const admin = initializeApp(firebaseConfig);
 const PORT = process.env.NODE_APP_PORT || 3000;
 
 // app.get('/', (req, res) => res.send('Express on Vercel'));
+app.get('/mysql', (req, res) => {
+  mysqlConnection.query(
+    'SELECT * FROM users',
+    (error, results, fields) => {
+      if (error) {
+        res.status(500).send('Error querying MySQL database');
+        return;
+      }
+      res.send(results);
+    }
+  );
+});
 
-let mongodb_atlas_password = process.env.NODE_APP_MG_PASSWORD;
-
-const uri = `mongodb+srv://tommyy1708:${mongodb_atlas_password}@distribution-demo.nqisq1k.mongodb.net/?retryWrites=true&w=majority&appName=distribution-demo`;
-
-// Create an new connection with MongoDB
-async function connect() {
-  try {
-    await mongoose.connect(uri);
-    console.log('Connected to MongoDB');
-
-    app.listen(PORT, () =>
-      console.log(`Server ready on port ${PORT}.`)
-    );
-  } catch (error) {4
-    console.log('Error connecting to MongoDB', error);
-  }
-}
-
-connect();
 
 app.post('/api/user', async (req, res) => {
   try {
