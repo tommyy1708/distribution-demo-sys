@@ -1144,6 +1144,43 @@ app.get('/api/supplier-all-product', async (req, res) => {
 });
 
 
+
+app.put(`/api/supplier-received`, async (req, res) => {
+  //verify token
+  if (!req.header('Authorization')) {
+    return;
+  }
+  const token = req.header('Authorization').slice(7);
+  const check = await supplierVerifyJwt(token);
+  if (!check) {
+    res.send({
+      errCode: 1,
+      message: 'Something wrong',
+    });
+  } else {
+    const params = req.body;
+    const order_number = params.orderNumber;
+    const userId = params.userId;
+
+    const userInfo = await GetUserInfoById(userId);
+
+    const result = await updateSupplierOrderStatus(order_number);
+
+    if (!result) {
+      res.send({
+        errCode: 1,
+        message: 'Database wrong',
+      });
+    } else {
+      res.send({
+        errCode: 0,
+        message: 'Success',
+      });
+    }
+  }
+});
+
+
 const PORT = process.env.NODE_APP_PORT || 8001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
