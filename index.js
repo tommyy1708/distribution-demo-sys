@@ -9,6 +9,7 @@ import csvParser from 'csv-parser';
 import fs from 'fs';
 import cors from 'cors';
 import {
+  getSupplierProducts,
   getSupplierUsers,
   checkSupplierPause,
   getUsers,
@@ -1123,6 +1124,22 @@ app.post('/api/supplier-select-message', async (req, res) => {
         message: response.message,
       });
     }
+  }
+});
+
+app.get('/api/supplier-all-product', async (req, res) => {
+  const response = await getSupplierProducts();
+  if (response) {
+    return res.send({
+      errCode: 0,
+      message: 'Success',
+      data: response,
+    });
+  } else {
+    return res.send({
+      errCode: 1,
+      message: 'Something wrong',
+    });
   }
 });
 

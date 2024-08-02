@@ -838,6 +838,7 @@ async function postBanner(image) {
 
 async function adminChange(adminCode) {
   const newAdmin = adminCode.admin === 1 ? 0 : 1;
+
   let sql = `UPDATE user_data SET admin = ?
              WHERE id = ?`;
   const values = [newAdmin, adminCode.id];
@@ -1123,6 +1124,16 @@ async function deleteSelectedMessages(messageIds) {
   }
 }
 
+async function getSupplierProducts() {
+  const [rows] = await db.query(
+    `
+    SELECT *
+    FROM inventory_data
+    `
+  );
+  return rows;
+}
+
 export {
   getSupplierUsers,
   checkSupplierPause,
@@ -1184,4 +1195,5 @@ export {
   updateMessageStatus,
   postSelectMessages,
   deleteSelectedMessages,
+  getSupplierProducts,
 };
