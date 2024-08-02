@@ -48,4 +48,20 @@ async function checkSupplierPause(userEmail) {
   }
 }
 
-export { getSupplierUsers, checkSupplierPause, getUsers };
+async function updateTokenHairSupplier(token, email) {
+  let sql = `UPDATE user_data SET token="${token}" WHERE email="${email}"`;
+  let getUserInfo = `SELECT * FROM user_data WHERE email="${email}"`;
+  await db.query(sql);
+  let aUserInfo = await db.query(getUserInfo);
+
+  //return the object{} of user info after login
+  return aUserInfo[0][0];
+}
+
+
+export {
+  getSupplierUsers,
+  checkSupplierPause,
+  getUsers,
+  updateTokenHairSupplier,
+};

@@ -8,7 +8,12 @@ import multer from 'multer';
 import csvParser from 'csv-parser';
 import fs from 'fs';
 import cors from 'cors';
-import {getSupplierUsers, checkSupplierPause,getUsers } from './server.js';
+import {
+  getSupplierUsers,
+  checkSupplierPause,
+  getUsers,
+  updateTokenHairSupplier,
+} from './server.js';
 dotenv.config();
 const app = express();
 
@@ -35,13 +40,13 @@ app.post('/api/supplier-login', async (req, res) => {
 
   const isPause = await checkSupplierPause(email);
 
-  if (!isPause) {
-    return res.send({
-      errCode: 1,
-      message: 'User not exists',
-    });
-  }
-  if (isPause[0].pause === 1) {
+  // if (!isPause) {
+  //   return res.send({
+  //     errCode: 1,
+  //     message: 'User not exists',
+  //   });
+  // }
+  if ( isPause[0].pause && isPause[0].pause === 1) {
     return res.send({
       errCode: 2,
       message: 'Account is paused. Please contact support.',
