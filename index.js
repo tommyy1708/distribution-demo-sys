@@ -479,6 +479,7 @@ app.post(`/api/supplier-addNewOrder`, async (req, res) => {
 
 
 app.get(`/api/supplier-orders`, async (req, res) => {
+  console.log('supplier-orders called');
   if (!req.header('Authorization')) {
     return;
   }
