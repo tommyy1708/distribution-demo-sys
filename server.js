@@ -536,6 +536,7 @@ async function getCategory() {
 
 //Verify supplier token
 const supplierVerifyJwt = (token) => {
+  console.log('token:', token);
   const verifyResult = jwt.verify(token, 'laoniu');
 
   if (!verifyResult) {
@@ -809,11 +810,17 @@ async function deleteCategory(categoryName) {
   }
 }
 
+
 async function postCategory(category) {
   let sql = `INSERT INTO category_data
-  (categoryName, image)
-  VALUES (?,?) `;
-  const values = [category.categoryName, category.url];
+  (categoryName, image, colorGuideImage, productImage)
+  VALUES (?,?,?,?) `;
+  const values = [
+    category.categoryName,
+    category.categoryImageUrl,
+    category.colorGuideImageUrl,
+    category.productImageUrl,
+  ];
 
   const response = await db.query(sql, values);
   if (response && response.length > 0) {
@@ -822,6 +829,8 @@ async function postCategory(category) {
     return false;
   }
 }
+
+
 async function postBanner(image) {
   let sql = `UPDATE banner_data
   SET url = ?

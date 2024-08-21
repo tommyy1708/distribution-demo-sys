@@ -227,7 +227,29 @@ app.post(`/api/update-csv`, async (req, res) => {
     });
 });
 
+// hair-supplier upload API endpoint for image upload
+app.post('/api/images', upload.single('file'), (req, res) => {
+  try {
+    // Assuming you want to return the uploaded image URL
+    const imageUrl = `http://${ServerAddress}:${ServerPort}/public/assets/images/${req.file.filename}`;
+    // const imageUrl = `https://orca-app-gcc6n.ondigitalocean.app/assets/images/${req.file.filename}`;
+    const imageName = req.file.filename;
+    const ogName = req.file.originalname;
 
+    res.send({
+      errCode: 0,
+      message: 'Upload Success',
+      data: {
+        url: imageUrl,
+        name: imageName,
+        originName: ogName,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Image upload failed' });
+  }
+});
 
 app.put(`/api/supplier-admin-change`, async (req, res) => {
   if (!req.header('Authorization')) {
@@ -394,6 +416,8 @@ app.get('/api/supplier-category/:id', async (req, res) => {
   } else {
     const category = req.params.id;
     const aCategoryList = await getSupplierCategoryList(category);
+    const categoryData = await getCategoryDetail(category);
+
     if (!aCategoryList) {
       res.send({
         errCode: 1,
@@ -416,6 +440,7 @@ app.get('/api/supplier-category/:id', async (req, res) => {
         errCode: 0,
         message: 'Success',
         data: aCategoryList,
+        categoryData: categoryData,
       });
     }
   }
