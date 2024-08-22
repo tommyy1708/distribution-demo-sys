@@ -525,6 +525,13 @@ const verifyJwt = (token) => {
 };
 
 //hair supplier Apis
+// Get category detail by category name
+async function getCategoryDetail(categoryName) {
+  let inquirySql = `SELECT * FROM category_data WHERE categoryName = ?`;
+  const value = [categoryName];
+  const aCategoryDetail = await db.query(inquirySql, value);
+  return aCategoryDetail[0];
+}
 
 
 // Get all category information
