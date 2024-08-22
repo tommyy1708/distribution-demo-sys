@@ -1212,4 +1212,5 @@ export {
   postSelectMessages,
   deleteSelectedMessages,
   getSupplierProducts,
+  getCategoryDetail,
 };

@@ -70,6 +70,7 @@ import {
   updateMessageStatus,
   postSelectMessages,
   deleteSelectedMessages,
+  getCategoryDetail,
 } from './server.js';
 dotenv.config();
 const app = express();
