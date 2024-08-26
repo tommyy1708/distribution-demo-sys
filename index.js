@@ -80,6 +80,25 @@ app.use(cors());
 app.use(express.json());
 
 
+const verificationTokens = async function (req, res, next) {
+  if (!req.header('Authorization')) {
+    return res.send({
+      errCode: 1,
+      message: 'No token provided',
+    });
+  }
+  const token = req.header('Authorization').slice(7);
+  const check = await supplierVerifyJwt(token);
+  if (!check) {
+    return res.send({
+      errCode: 1,
+      message: 'Something wrong',
+    });
+  }
+  next();
+};
+
+
 app.post('/api/supplier-login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -381,18 +400,19 @@ app.get('/api/quote_history', async (req, res) => {
 
 
 
-app.get('/api/supplier-category', async (req, res) => {
-  if (!req.header('Authorization')) {
-    return;
-  }
-  const token = req.header('Authorization').slice(7);
-  const check = await supplierVerifyJwt(token);
-  if (!check) {
-    res.send({
-      errCode: 1,
-      message: 'Something wrong',
-    });
-  } else {
+app.get('/api/supplier-category',verificationTokens, async (req, res) => {
+  // if (!req.header('Authorization')) {
+  //   return;
+  // }
+  // const token = req.header('Authorization').slice(7);
+  // const check = await supplierVerifyJwt(token);
+  // if (!check) {
+  //   res.send({
+  //     errCode: 1,
+  //     message: 'Something wrong',
+  //   });
+  // } else {
+
     const category = await getCategory();
 
     res.send({
@@ -400,7 +420,7 @@ app.get('/api/supplier-category', async (req, res) => {
       message: 'Success',
       data: category,
     });
-  }
+  // }
 });
 
 app.get('/api/supplier-category/:id', async (req, res) => {
