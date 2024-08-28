@@ -81,21 +81,58 @@ app.use(express.json());
 
 
 const verificationTokens = async function (req, res, next) {
-  if (!req.header('Authorization')) {
-    return res.send({
+  const authHeader = req.header('Authorization');
+  if (!authHeader) {
+    return res.status(401).json({
       errCode: 1,
       message: 'No token provided',
     });
   }
-  const token = req.header('Authorization').slice(7);
-  const check = await supplierVerifyJwt(token);
-  if (!check) {
-    return res.send({
+
+  // Step 2: Validate the format of the Authorization header
+  if (!authHeader.startsWith('Bearer ')) {
+    return res.status(400).json({
       errCode: 1,
-      message: 'Something wrong',
+      message:
+        'Invalid token format. Expected format: Bearer <token>',
     });
   }
-  next();
+
+  // Step 3: Extract the token
+  const token = authHeader.split(' ')[1];
+  if (!token) {
+    return res.status(400).json({
+      errCode: 1,
+      message: 'Token is missing',
+    });
+  }
+
+  try {
+
+    // Step 4: Verify the token using jwt.verify
+    const decodeToken = jwt.verify(token, process.env.SECRET);
+    next();
+
+  } catch (error) {
+    // Step 5: Handle errors related to token verification
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        errCode: 1,
+        message: 'Token has expired',
+      });
+    } else if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        errCode: 1,
+        message: 'Invalid token',
+      });
+    } else {
+      // Catch any other errors
+      return res.status(500).json({
+        errCode: 1,
+        message: 'An error occurred while validating the token',
+      });
+    }
+  }
 };
 
 
@@ -123,7 +160,10 @@ app.post('/api/supplier-login', async (req, res) => {
 
   const sPassWord = aAccountInfo.passWord.toString();
 
-  if (aAccountInfo && password === sPassWord) {
+    const isPasswordValid = await bcrypt.compare(password, sPassWord);
+
+
+  if (isPasswordValid) {
     let token = jwt.sign(aAccountInfo, `${process.env.SECRET}`, {
       expiresIn: '24h',
     });
@@ -584,20 +624,9 @@ app.get(`/api/supplier-user`, async (req, res) => {
   }
 });
 
-app.post(`/api/supplier-user`, async (req, res) => {
-  if (!req.header('Authorization')) {
-    return;
-  }
-  const token = req.header('Authorization').slice(7);
-  const check = await supplierVerifyJwt(token);
-
-  if (!check) {
-    return res.send({
-      errCode: 1,
-      message: 'Something wrong',
-    });
-  } else {
-    const { params } = req.body;
+app.post(`/api/supplier-user`,verificationTokens, async (req, res) => {
+  const { params } = req.body;
+  
     const response = await postUser(params);
 
     if (!response) {
@@ -611,7 +640,6 @@ app.post(`/api/supplier-user`, async (req, res) => {
         message: 'Customer added successfully!',
       });
     }
-  }
 });
 
 app.post(`/api/supplier-product`, async (req, res) => {

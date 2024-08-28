@@ -31,7 +31,6 @@ async function getUsers() {
   `,
       [email]
     );
-    //return Object {}
     return rows[0][0];
   }
 
@@ -192,8 +191,10 @@ async function updateToken(token, username) {
 
 async function updateProductsDetail(data) {
   let id = data.item_code;
+
   const sql =
     'UPDATE inventory_data SET item_code = ?, item = ?, qty = ?, price = ?, cost = ?, category = ?, amount = ? WHERE `key` = ?';
+
   const values = [
     data.item_code,
     data.item,
@@ -204,6 +205,7 @@ async function updateProductsDetail(data) {
     data.amount,
     data.key,
   ];
+
   await db.query(sql, values, (error, result, fields) => {
     if (error) {
       console.error('Error updating inventory data:', error);
@@ -690,27 +692,42 @@ async function getSupplierOrderByDate(begin, end) {
 }
 
 async function postUser(user) {
-  const userInfo = JSON.parse(user);
-  let sql = `
+  try {
+    const defaultPassword = '12345678';
+    const hashedPassword = await bcrypt.hash(
+      defaultPassword,
+      saltRounds
+    );
+
+    let sql = `
       INSERT INTO user_data
-  (first_name, last_name, email, phone, mobile_number, address, shipping_address)
-  VALUES (?, ?, ?, ?, ?, ?, ?) `;
-  const values = [
-    userInfo.first_name,
-    userInfo.last_name,
-    userInfo.email,
-    userInfo.phone,
-    userInfo.mobile_number,
-    userInfo.address,
-    userInfo.shipping_address,
-  ];
-  const response = await db.query(sql, values);
-  if (response && response.length > 0) {
-    return true;
-  } else {
+      (first_name, last_name, email, phone, mobile_number, address, shipping_address, passWord)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?) `;
+
+    const values = [
+      userInfo.first_name,
+      userInfo.last_name,
+      userInfo.email,
+      userInfo.phone,
+      userInfo.mobile_number,
+      userInfo.address,
+      userInfo.shipping_address,
+      hashedPassword,
+    ];
+
+    const response = await db.query(sql, values);
+    if (response && response.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    console.error('Error hashing password:', error);
     return false;
   }
 }
+
+
 async function postProduct(product) {
   const productInfo = JSON.parse(product);
   let sql = `
