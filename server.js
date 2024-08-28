@@ -1,7 +1,7 @@
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
-const bcrypt = require('bcrypt');
+import bcrypt from 'bcrypt';
 const saltRounds = 10;
 dotenv.config();
 
