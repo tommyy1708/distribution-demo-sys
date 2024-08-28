@@ -72,6 +72,7 @@ import {
   deleteSelectedMessages,
   getCategoryDetail,
 } from './server.js';
+const bcrypt = require('bcrypt');
 dotenv.config();
 const app = express();
 
@@ -626,7 +627,7 @@ app.get(`/api/supplier-user`, async (req, res) => {
 
 app.post(`/api/supplier-user`,verificationTokens, async (req, res) => {
   const { params } = req.body;
-  
+
     const response = await postUser(params);
 
     if (!response) {

@@ -1,7 +1,8 @@
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
-
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 dotenv.config();
 
 
@@ -1166,6 +1167,46 @@ async function getSupplierProducts() {
   );
   return rows;
 }
+
+
+
+async function hashExistingPasswords() {
+  try {
+    // Fetch all users from the database
+    const users = await db.query(
+      'SELECT id, passWord FROM user_data'
+    );
+
+    console.log('user', users);
+
+    for (let user of users[0]) {
+      const { id, passWord } = user;
+
+      if (!passWord) {
+        console.warn(`User ID ${id} has no password. Skipping...`);
+        continue;
+      }
+
+      // Hash the plaintext password
+      const hashedPassword = await bcrypt.hash(passWord, saltRounds);
+
+      // Update the user's password in the database
+      await db.query(
+        'UPDATE user_data SET passWord = ? WHERE id = ?',
+        [hashedPassword, id]
+      );
+
+      console.log(`Password for user ID ${id} hashed and updated.`);
+    }
+
+    console.log('Passwords successfully hashed and updated.');
+  } catch (error) {
+    console.error('Error updating passwords:', error);
+  }
+}
+
+
+hashExistingPasswords();
 
 export {
   getSupplierUsers,
