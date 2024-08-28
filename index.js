@@ -12,31 +12,11 @@ import {
   getSupplierProducts,
   getSupplierUsers,
   checkSupplierPause,
-  getUsers,
   updateTokenHairSupplier,
-  getUserByName,
-  getUserByEmail,
-  getOrderByNumber,
-  getAllOrderHistory,
   getQuotesData,
   getOrderBetweenDate,
-  getAllInventory,
-  getInventoryData,
-  getProductsDetail,
-  updateToken,
-  updateProductsDetail,
-  addingDataToOrderData,
-  getClientData,
-  addingNewClient,
-  updateInventory,
-  addSpendOnClient,
-  addInventoryData,
-  getDataFromAddInventory,
-  getDataAddInventoryByKey,
-  updateAddInventory,
   getTotalCost,
   addingNewToInventory,
-  verifyJwt,
   getCategory,
   supplierVerifyJwt,
   getSupplierCategoryList,
@@ -512,7 +492,6 @@ app.get('/api/supplier-category/:id', async (req, res) => {
 
 app.put('/api/passwordUpdate', async (req, res) => {
   const params = req.body;
-
   const userInfo = await supplierGetUserInfo(params);
   if (!userInfo) {
     res.send({

@@ -565,26 +565,39 @@ async function getSupplierCategoryList(categoryName) {
   return aCategoryList[0];
 }
 
-//Get user info
+
 async function supplierGetUserInfo(userinfo) {
-  const userId = userinfo.userId;
-  const updateFields = Object.keys(userinfo)
-    .filter((key) => key !== 'userId')
-    .map((key) => `${key} = ?`)
-    .join(', ');
+  const { userId, passWord, ...otherFields } = userinfo;
 
-  const values = Object.values(userinfo).filter(
-    (value, index) =>
-      index !== Object.keys(userinfo).indexOf('userId')
-  );
-
-  if (!userId || values.length === 0) {
-    throw new Error('Invalid request');
+  if (!userId) {
+    throw new Error('User ID is required');
   }
 
-  let inquirySql = `UPDATE user_data SET ${updateFields} WHERE id = ?`;
-  const value = [...values, userId];
-  const returnValue = await db.query(inquirySql, value);
+  const updateFields = [];
+  const values = [];
+
+  for (const [key, value] of Object.entries(otherFields)) {
+    console.log('key:', key, 'value:', value);
+    updateFields.push(`${key} = ?`);
+    values.push(value);
+  }
+
+  if (passWord) {
+    const hashedPassword = await bcrypt.hash(passWord, saltRounds);
+    updateFields.push('passWord = ?');
+    values.push(hashedPassword);
+  }
+
+  if (updateFields.length === 0) {
+    throw new Error('No fields to update');
+  }
+
+  const inquirySql = `UPDATE user_data SET ${updateFields.join(
+    ', '
+  )} WHERE id = ?`;
+  values.push(userId);
+
+  const returnValue = await db.query(inquirySql, values);
 
   return returnValue[0];
 }
@@ -1206,7 +1219,6 @@ async function hashExistingPasswords() {
 }
 
 
-hashExistingPasswords();
 
 export {
   getSupplierUsers,
