@@ -72,7 +72,8 @@ import {
   deleteSelectedMessages,
   getCategoryDetail,
 } from './server.js';
-const bcrypt = require('bcrypt');
+import bcrypt from 'bcrypt';
+
 dotenv.config();
 const app = express();
 
