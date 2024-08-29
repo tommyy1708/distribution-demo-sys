@@ -577,7 +577,6 @@ async function supplierGetUserInfo(userinfo) {
   const values = [];
 
   for (const [key, value] of Object.entries(otherFields)) {
-    console.log('key:', key, 'value:', value);
     updateFields.push(`${key} = ?`);
     values.push(value);
   }
